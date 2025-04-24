@@ -1,5 +1,10 @@
 # Minishell
 
+<div align="center">
+  <a href="#project-overview"><img src="https://img.shields.io/badge/Read%20in-English-blue?style=for-the-badge" alt="English"></a>
+  <a href="#شنو-هو-هاد-المشروع"><img src="https://img.shields.io/badge/اقرأ%20بالدارجة-المغربية-green?style=for-the-badge" alt="Moroccan Darija"></a>
+</div>
+
 ## Project Overview
 
 Minishell is a simplified shell implementation project that mimics basic functionalities of bash. This project challenges you to create a command-line interpreter from scratch, providing deep insights into how shells work, process management, and system calls in Unix-based operating systems.
@@ -151,6 +156,10 @@ minishell/
 
 المشروع بالدارجة المغربية:
 
+<div align="center">
+  <a href="#project-overview"><img src="https://img.shields.io/badge/Read%20in-English-blue?style=for-the-badge" alt="English"></a>
+  <a href="#شنو-هو-هاد-المشروع"><img src="https://img.shields.io/badge/Darija -green?style=for-the-badge" alt="Moroccan Darija"></a>
+</div>
 
 ## شنو هو هاد المشروع؟
 
