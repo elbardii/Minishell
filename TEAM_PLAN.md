@@ -12,7 +12,8 @@
 ### Main Task Distribution:
 
 ## 1. Phase One: Study and Preparation (One Week)
-
+  
+  
 #### @yatanagh:
 - **Detailed study of Process Management:**
   * Documentation of fork(), wait(), waitpid(), wait3(), wait4()
