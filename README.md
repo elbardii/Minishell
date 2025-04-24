@@ -158,7 +158,7 @@ minishell/
 
 <div align="center">
   <a href="#project-overview"><img src="https://img.shields.io/badge/Read%20in-English-blue?style=for-the-badge" alt="English"></a>
-  <a href="#شنو-هو-هاد-المشروع"><img src="https://img.shields.io/badge/Darija -green?style=for-the-badge" alt="Moroccan Darija"></a>
+  <a href="Darija "><img src="https://img.shields.io/badge/Darija -green?style=for-the-badge" alt="Moroccan Darija"></a>
 </div>
 
 ## شنو هو هاد المشروع؟
