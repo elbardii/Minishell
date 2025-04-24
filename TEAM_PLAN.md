@@ -18,21 +18,25 @@
   * Documentation of fork(), wait(), waitpid(), wait3(), wait4()
   * Understanding how to create child processes and wait for them
   * Exploring execve() and how to replace processes
+  * Create markdown documentation in `/documentations/process_management.md`
 
 - **Study of Signals and their management:**
   * signal(), sigaction(), sigemptyset(), sigaddset(), kill()
   * How to handle ctrl-C, ctrl-D, and ctrl-\
+  * Create markdown documentation in `/documentations/signal_management.md`
 
 #### @isel-bar:
 - **Detailed study of File Descriptors and Redirections:**
   * pipe(), dup(), dup2()
   * open(), close(), read(), write()
   * Understanding how < > << >> work
+  * Create markdown documentation in `/documentations/file_descriptors.md`
 
 - **Study of Command Line Parsing:**
   * How to analyze user input text
   * Handling quotation marks (' and ")
   * Study of readline() and add_history()
+  * Create markdown documentation in `/documentations/command_parsing.md`
 
 ## 2. Phase Two: Project Basic Structure (One Week)
 
@@ -188,21 +192,25 @@
   * توثيق fork(), wait(), waitpid(), wait3(), wait4()
   * فهم كيفية إنشاء عمليات فرعية والانتظار ديالها
   * استكشاف execve() وكيفية استبدال العمليات
+  * إنشاء توثيق في ملف `/documentations/process_management.md`
 
 - **دراسة الإشارات (Signals) وإدارتها:**
   * signal(), sigaction(), sigemptyset(), sigaddset(), kill()
   * كيفية التعامل مع ctrl-C, ctrl-D و ctrl-\
+  * إنشاء توثيق في ملف `/documentations/signal_management.md`
 
 #### @isel-bar:
 - **دراسة مفصلة لواصفات الملفات وإعادة التوجيه:**
   * pipe(), dup(), dup2()
   * open(), close(), read(), write()
   * فهم كيفية عمل < > << >>
+  * إنشاء توثيق في ملف `/documentations/file_descriptors.md`
 
 - **دراسة تحليل سطر الأوامر:**
   * كيفية تحليل النص اللي دخلو المستخدم
   * التعامل مع علامات التنصيص (' و ")
   * دراسة readline() و add_history()
+  * إنشاء توثيق في ملف `/documentations/command_parsing.md`
 
 ## 2. المرحلة الثانية: البنية الأساسية للمشروع (أسبوع واحد)
 
