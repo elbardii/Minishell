@@ -1,21 +1,83 @@
+# System Calls: fork, wait, execve b Darija
 
 ## 1. Definitions:
-#### fork() :
-    katkhla9 lina process jdid (child process) tib9 l2asl l'main process (parent precess) kay3tih copy dyal memory, file descriptor... bwahd technique smitha copy-On-Write, katreturni l child 0 o l'parent katreturni lih pid dyal child w -1 f 7alat tra chi mochkil, child kaykml mn lpoint flcode li wsal lih lparent fach 3yt l fork, btw rah makinach chi taratobiya binathom y3ni momkin child ykhdm lwl momkin parent ykhdm lwl, f7alat ma drty 3awtani fork mora lwla ght3awd tcree lina child process mn lparent wlkin maghtcreeyich wahd lchild li drna flwl.
 
-#### wait() :
-    ktkhali l'parent ytsna chi child process ymot, ktrj3 PID dyalo, katkhdm bach t7yd zombie processes, ila makin hta child process ktrj3 -1 w kat7t errno. katcontroli l'order dyal l'execution.
+Hado homa chi fonctions (system calls) mouhimmin f les systèmes bhal Linux/Unix:
 
-#### waitpid() :
-    hadi bhal wait ghahowa blast mntsnaw ay child process ysali kntsnaw process bdabt ysali.
+#### `fork()`:
 
-#### wait3/wait4 :
-    bhal wait w waitpid gha homa ky3tiwk hta resource usage f struct rusage gha howa wait3 ktsna ay child process w wait4 t9dr t3tiha pid dyalo.
+* **Ash kadir:** Katkhla9 process jdid (kaytsemma `child process`) li howa nouskha tib9 l2asl dyal l-process li 3iyyet liha (kaytsemma `parent process`).
+* **Kifach:** Katpartaji m3ah la mémoire, les file descriptors, etc., b wa7ed technique smitha `Copy-On-Write` (kaydiro copy ghir melli chi we7ed ybghi ybeddel chi 7aja).
+* **Ash katرجع:**
+    * L l-`child process` katreturni `0`.
+    * L l-`parent process` katreturni l `PID` (Process ID) dyal l `child`.
+    * Katreturni `-1` f 7alat wqe3 chi mochkil (o kat7et sbab f `errno`).
+* **L-Execution:** L `child` kaybda l-khdma mn nefs l-blassa f l-code li wsel liha l `parent` fach 3iyyet l `fork()`.
+* **Taratobiya:** Makaynach taratobiya bin l `parent` o l `child`, y3ni momkin ay we7ed fihom ysbbe9 l-akhor f l-execution.
+* **Multiple Forks:** Ila l `parent` 3awed dar `fork()` mera khera, ghaytkheli9 `child` jdid men dak l `parent`, machi men l `child` lewwel.
 
-## 2. Understanding:
+#### `wait()`:
 
-    ila bghina ncreeyiw wahd child process kn3yto 3la fork() li ktkhli lprocess ybda lkhdma mn wra lcall dyalha ktreturni lih 0 w ktreturni l parent pid dyal child, ila bghina ntsnawh n9dro n3yto 3la ay wait mn li chr7t f wahd if statement ila kan dak return mn ghir zero ydir wait binma sala lprocess dyal child.
+* **Ash kadir:** Katkhalli l `parent process` yb9a ytsenna (block) 7talash chi wa7ed men lwlad dyalo (`child process`) ymout (ysali l-khdma dyalo).
+* **Ash katرجع:**
+    * Katرجع l `PID` dyal l `child` li mat.
+    * Katرجع `-1` ila makan 3ndo 7ta `child` khddam, awla ila wqe3 chi mochkil (o kat7et `errno`).
+* **Fayda:** Mouhimma bach t7iyed dakchi li kaytsemma `zombie processes` (les child li salaw walakin baqin kaytsennaw l parent yakhod l-information dyalhom) o bach tcontroli l-ordre dyal l'execution (matalan parent ytsenna child ysali 3ad ykemmel).
 
-## 3. execve() :
+#### `waitpid()`:
 
-    hiya system call f Linux/Unix li katkhali l'process li khddam daba ybdl rasso b programme jdid. Katms7 koulchi li kayn f la mémoire dyal lprocess l9dim (mn code, data, stack...), w katsayb plasso l-programme jdida li kat3tiha (pathname), m3a l-arguments (argv) w les variables dyal l'environment (envp). Mlli execve() katnaja7, l'process l9dim kaytna9a w l'programme jdid kaykhdem b nafs l'PID. execve() makatrd lik 7ta haja ila khdmat w errno ila tra chi mochkil, li kay3ni bli l'execution katsift l'massar jdid bla ma katsali l'function. Lmzyan f execve() howa f fork() w execve() m3a ba3dhiyathom: katdir fork() bach tkhl9 process jdida, w dak process (weld) kaydir execve() bach ybddl rasso b programme jdid, bla may2tr 3la lprocess l2asli (parent)
+* **Ash kadir:** B7al `wait()` تماماً, ghir howa kat3tiha l `PID` dyal `child` li bghitih ytsenna bdabt, machi ay `child` w safi. Kat9der tzid 7ta options khrin bach tcontroli kifach kattsenna.
+* **Ash katرجع:** Katرجع l `PID` dyal dak l `child` li tsennetih, `0` (f 7alat l option `WNOHANG`), awla `-1` ila wqe3 mochkil (`errno`).
+
+#### `wait3()` / `wait4()`:
+
+* **Ash kadir:** B7al `wait()` (`wait3`) wla `waitpid()` (`wait4`) f l-principe dyal ttsenna chi `child` ysali.
+* **Ziyada:** Kayzido 3la dok lkhrin annahom kayرجعo lik 7ta des informations 3la les resources li stahlek dak l `child` (CPU time, memory...) f wa7ed la structure smitha `struct rusage`.
+    * `wait3()` katsenna ay `child`.
+    * `wait4()` kat9der t3tiha `PID` mo7ddad dyal `child` li bghiti ttsenna.
+
+## 2. Understanding (Kifach Nkhadmohom):
+
+Melli nbghiw nkhadmo chi programme f process jdid bla manweqfo l-programme dyalna l-asli:
+
+1.  **Kheli9 Process Jdid:** Kan3iyto 3la `fork()`. Hna kayweliw 3ndna jouj dyal les processes:
+    * L `parent`: `fork()` katرجع lih l `PID` dyal l `child`.
+    * L `child`: `fork()` katرجع lih `0`.
+2.  **Tfari9 Lkhdma:** Kansta3mlo dik l valeur li rj3at men `fork()` bach nferqo lkhdma:
+    * **F l-Code dyal l Parent (ila return machi 0):** Hna l parent 3aref rasso howa l parent. Ila bgha ytsenna l weld ysali, kay9der y3iyyet l chi fonction men `wait()` / `waitpid()` etc. Kayb9a ytsenna 7talash tرجع lih l function (m3naha l weld sala).
+    * **F l-Code dyal l Child (ila return 0):** Hna l child 3aref rasso howa l child. Hna fin kaydir dakchi li bghina l child ydir, w f l-ghalib kay3iyyet l `execve()` (chofo section 3) bach ybeddel raso l programme we7dakhor.
+
+```c
+#include <unistd.h>
+#include <sys/wait.h>
+#include <stdio.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        // Fork failed
+        perror("fork failed");
+        return 1;
+    } else if (pid == 0) {
+        // *** Code dyal l Child Process ***
+        printf("Ana l-child process (PID: %d)\n", getpid());
+        // Hna fin l child kaydir execve() normalement
+        // execlp("/bin/ls", "ls", "-l", NULL); // Example: run ls -l
+        // perror("exec failed"); // Ila execve() rj3at, rah wqe3 mochkil
+        // _exit(1); // Child kaykhroj ila exec failat
+        printf("Child process kaykmmel...\n"); // Had l code ma ghaybanch ila exec nej7at
+        return 0; // Child kaykhroj
+    } else {
+        // *** Code dyal l Parent Process ***
+        printf("Ana l-parent process (PID: %d), kantsenna l child (PID: %d)\n", getpid(), pid);
+        int status;
+        waitpid(pid, &status, 0); // Parent kaytsenna l child bdabt ysali
+        if (WIFEXITED(status)) {
+            printf("Parent: L child sala b status %d\n", WEXITSTATUS(status));
+        } else {
+            printf("Parent: L child sala b tariqa ghayr tabi3iya\n");
+        }
+    }
+    return 0;
+}
