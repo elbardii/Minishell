@@ -1,0 +1,7 @@
+total 72
+-rwxr-xr-x 1 ismail ismail 19816 Apr 25 03:26 Pipes
+-rw-r--r-- 1 ismail ismail   382 Apr 24 21:31 Pipes.c
+-rwxr-xr-x 1 ismail ismail 17240 Apr 25 21:50 a.out
+-rwxr-xr-x 1 ismail ismail 20648 Apr 25 21:53 macroshell
+-rw-r--r-- 1 ismail ismail  1983 Apr 25 21:50 macroshell.c
+-rw-r--r-- 1 ismail ismail     0 Apr 25 21:59 output.txt
