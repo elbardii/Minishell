@@ -1,6 +1,8 @@
 #include "executor.h"
 #include "builtins.h"
+#include "signals.h"
 #include <fcntl.h>
+#include <signal.h>
 
 static void	print_minishell_error(const char *name, const char *msg)
 {
@@ -287,6 +289,9 @@ int	handle_heredoc(char *delimiter)
 	if (pid == 0)
 	{
 		// Child process - read heredoc content
+		/* Reset signals so heredoc child exits on Ctrl-C and behaves like a normal process */
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
 		close(pipefd[0]);
 		while (1)
 		{
@@ -306,9 +311,14 @@ int	handle_heredoc(char *delimiter)
 	}
 	else
 	{
-		// Parent process
+		// Parent process - ignore SIGINT while waiting for heredoc child
 		close(pipefd[1]);
+		signal(SIGINT, SIG_IGN);
+		signal(SIGQUIT, SIG_IGN);
 		waitpid(pid, NULL, 0);
+		// Restore parent handlers
+		signal(SIGINT, handle_sigint);
+		signal(SIGQUIT, SIG_IGN);
 		return (pipefd[0]);
 	}
 }
@@ -361,14 +371,19 @@ static int	execute_simple_command(t_simple_cmd *cmd, t_env *env)
     
     env_array = env_to_array(env);
     
-    pid = fork();
-    if (pid == 0)
-    {
-        // Child process - handle redirections here
-        if (handle_redirections(cmd->redirs) != 0)
-            exit(1);
-        
-        execve(executable, cmd->args, env_array);
+	pid = fork();
+	if (pid == 0)
+	{
+		/* Child process - restore default signal handling so it
+		   reacts normally to SIGINT/SIGQUIT (like /bin/cat) */
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
+
+		/* Child process - handle redirections here */
+		if (handle_redirections(cmd->redirs) != 0)
+			exit(1);
+
+		execve(executable, cmd->args, env_array);
         // On execve failure, map errno to message/exit code
         msg = NULL;
         mapped_exit = map_exec_errno(cmd->args[0], ft_strchr(cmd->args[0], '/') != NULL, errno, &msg);
@@ -377,15 +392,24 @@ static int	execute_simple_command(t_simple_cmd *cmd, t_env *env)
     }
     else if (pid > 0)
     {
-        // Parent process
-        waitpid(pid, &status, 0);
+		// Parent process - ignore SIGINT/SIGQUIT while waiting for child
+		signal(SIGINT, SIG_IGN);
+		signal(SIGQUIT, SIG_IGN);
+		waitpid(pid, &status, 0);
+		// Restore parent signal handlers: keep SIGQUIT ignored and
+		// SIGINT handled by readline handler
+		signal(SIGINT, handle_sigint);
+		signal(SIGQUIT, SIG_IGN);
         // Free only if it was allocated (PATH search)
         if (executable != cmd->args[0])
             free(executable);
         free_env_array(env_array);
         if (WIFEXITED(status))
             return (WEXITSTATUS(status));
-        return (1);
+		/* If child terminated by signal, return 128 + signum (common bash behaviour) */
+		if (WIFSIGNALED(status))
+			return (128 + WTERMSIG(status));
+		return (1);
     }
     else
     {
@@ -423,7 +447,11 @@ static int	execute_pipe_command(t_command *cmd, t_env *env)
 
 	if (pid1 == 0)
 	{
-		// First child process (left side of pipe)
+		/* First child process (left side of pipe) */
+		/* Reset signals to defaults in child */
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
+
 		close(pipefd[0]); // Close read end
 		if (dup2(pipefd[1], STDOUT_FILENO) == -1)
 		{
@@ -445,7 +473,11 @@ static int	execute_pipe_command(t_command *cmd, t_env *env)
 
 	if (pid2 == 0)
 	{
-		// Second child process (right side of pipe)
+		/* Second child process (right side of pipe) */
+		/* Reset signals to defaults in child */
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
+
 		close(pipefd[1]); // Close write end
 		if (dup2(pipefd[0], STDIN_FILENO) == -1)
 		{
@@ -460,13 +492,23 @@ static int	execute_pipe_command(t_command *cmd, t_env *env)
 	close(pipefd[0]);
 	close(pipefd[1]);
 
+	// Parent should ignore SIGINT/SIGQUIT while waiting for pipeline children
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
+
 	// Wait for both children
 	waitpid(pid1, &status1, 0);
 	waitpid(pid2, &status2, 0);
 
+	// Restore parent handlers
+	signal(SIGINT, handle_sigint);
+	signal(SIGQUIT, SIG_IGN);
+
 	// Return exit status of the last command in the pipeline
 	if (WIFEXITED(status2))
 		final_status = WEXITSTATUS(status2);
+	else if (WIFSIGNALED(status2))
+		final_status = 128 + WTERMSIG(status2);
 	else
 		final_status = 1;
 
