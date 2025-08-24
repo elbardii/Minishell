@@ -43,6 +43,25 @@ static void	print_with_escape(char *str, int interpret_escapes)
     }
 }
 
+// Helper: treat -n, -nn, -nnn ... as the -n flag (match bash behavior)
+static int is_n_flag(char *s)
+{
+    int j;
+
+    if (!s || s[0] != '-')
+        return (0);
+    j = 1;
+    if (s[j] != 'n')
+        return (0);
+    while (s[j])
+    {
+        if (s[j] != 'n')
+            return (0);
+        j++;
+    }
+    return (1);
+}
+
 int	builtin_echo(char **args)
 {
 	int	i;
@@ -50,27 +69,28 @@ int	builtin_echo(char **args)
 	int	first_arg;
 	int	interpret_escapes;
 
+
 	newline = 1;
 	interpret_escapes = 0;
 	i = 1;
 	first_arg = 1;
 	
-	// Check for flags
-	while (args[i] && args[i][0] == '-')
-	{
-		if (ft_strncmp(args[i], "-n", 2) == 0 && !args[i][2])
-		{
-			newline = 0;
-			i++;
-		}
-		else if (ft_strncmp(args[i], "-e", 2) == 0 && !args[i][2])
-		{
-			interpret_escapes = 1;
-			i++;
-		}
-		else
-			break;
-	}
+    // Check for flags. Accept -n, -nnn... as -n (suppress newline)
+    while (args[i] && args[i][0] == '-')
+    {
+        if (is_n_flag(args[i]))
+        {
+            newline = 0;
+            i++;
+        }
+        else if (ft_strncmp(args[i], "-e", 2) == 0 && !args[i][2])
+        {
+            interpret_escapes = 1;
+            i++;
+        }
+        else
+            break;
+    }
 	
     // Print arguments with spaces between them
     while (args[i])
